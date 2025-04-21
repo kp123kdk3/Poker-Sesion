@@ -1,0 +1,41 @@
+{
+    "players": {},
+    "sessions": [
+        {
+            "date": "2025-04-21",
+            "initial_buyin": 20.0,
+            "players": [
+                {
+                    "name": "Ryan",
+                    "total_buyins": 20.0,
+                    "cash_out": 50.0,
+                    "profit": 30.0
+                },
+                {
+                    "name": "keegan",
+                    "total_buyins": 20.0,
+                    "cash_out": 0,
+                    "profit": 0
+                },
+                {
+                    "name": "guru",
+                    "total_buyins": 20.0,
+                    "cash_out": 0,
+                    "profit": 0
+                },
+                {
+                    "name": "Christophe",
+                    "total_buyins": 20.0,
+                    "cash_out": 0,
+                    "profit": 0
+                },
+                {
+                    "name": "Jack",
+                    "total_buyins": 20.0,
+                    "cash_out": 0,
+                    "profit": 0
+                }
+            ]
+        }
+    ]
+}
