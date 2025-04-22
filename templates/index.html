@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Session Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">Poker Tracker</h1>
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+                <li><a href="#" data-page="new-session">New Session</a></li>
+                <li><a href="#" data-page="leaderboard">Leaderboard</a></li>
+                <li><a href="#" data-page="players">Players</a></li>
+                <li><a href="#" data-page="history">History</a></li>
+                <li id="profile-nav-item">
+                    <a href="#" data-page="profile" class="profile-button">
+                        <img id="nav-profile-pic" src="/static/default-avatar.png" alt="Profile" class="nav-profile-pic">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="dashboard-grid">
+                <!-- Profile Summary Card -->
+                <div class="dashboard-card profile-summary">
+                    <div class="profile-header">
+                        <div class="profile-image-section">
+                            <img id="dashboard-profile-pic" src="/static/default-avatar.png" alt="Profile Picture" class="profile-picture">
+                            <button class="btn btn-primary change-avatar-btn" id="change-profile-btn">Change Profile Picture</button>
+                        </div>
+                        <div class="profile-info-section">
+                            <h3 id="dashboard-username">Guest User</h3>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="dashboard-total-sessions">0</span>
+                                    <span class="stat-label">Sessions</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="dashboard-win-rate">0%</span>
+                                    <span class="stat-label">Win Rate</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="dashboard-total-profit">$0</span>
+                                    <span class="stat-label">Profit</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Statistics Card -->
+                <div class="dashboard-card game-stats">
+                    <h3>Game Statistics</h3>
+                    <div class="time-filters">
+                        <button class="btn btn-outline-primary active" data-days="1">1 Day</button>
+                        <button class="btn btn-outline-primary" data-days="5">5 Days</button>
+                        <button class="btn btn-outline-primary" data-days="10">10 Days</button>
+                    </div>
+                    <div class="stats-chart">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                    <div class="stats-summary">
+                        <div class="stat-box">
+                            <h4>Best Session</h4>
+                            <p id="best-session">$0</p>
+                        </div>
+                        <div class="stat-box">
+                            <h4>Worst Session</h4>
+                            <p id="worst-session">$0</p>
+                        </div>
+                        <div class="stat-box">
+                            <h4>Average Profit</h4>
+                            <p id="avg-profit">$0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Sessions Card -->
+                <div class="dashboard-card recent-sessions">
+                    <h3>Recent Sessions</h3>
+                    <div class="sessions-list" id="recent-sessions-list">
+                        <!-- Sessions will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Friends Card -->
+                <div class="dashboard-card friends-section">
+                    <div class="friends-header">
+                        <h3>Friends</h3>
+                        <button class="btn btn-primary" id="add-friend-btn">
+                            <i class="fas fa-user-plus"></i> Add Friend
+                        </button>
+                    </div>
+                    <div class="friends-list" id="friends-list">
+                        <!-- Friends will be populated here -->
+                    </div>
+                    <div class="friend-requests" id="friend-requests">
+                        <h4>Friend Requests</h4>
+                        <div class="friend-requests-list">
+                            <!-- Friend requests will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Friend Modal -->
+                <div id="add-friend-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h2>Add Friend</h2>
+                        <div class="form-group">
+                            <label for="friend-username">Search for players</label>
+                            <div id="friend-username-container">
+                                <input type="text" id="friend-username" class="form-control" placeholder="Type username to search...">
+                                <div id="search-results"></div>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" id="send-friend-request">Send Request</button>
+                            <button class="btn" id="close-friend-modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Card -->
+                <div class="dashboard-card leaderboard">
+                    <h3>Top Players</h3>
+                    <div class="leaderboard-list" id="dashboard-leaderboard">
+                        <!-- Leaderboard items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Session Page -->
+        <div id="new-session" class="page">
+            <h2>Start New Session</h2>
+            <form id="new-session-form" class="form">
+                <div class="form-group">
+                    <label for="session-date">Date:</label>
+                    <input type="date" id="session-date" name="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="buy-in">Buy-in Amount:</label>
+                    <input type="number" id="buy-in" name="buy_in_amount" class="form-control" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Players</label>
+                    <div id="players-list"></div>
+                    <button type="button" class="btn" id="add-player-btn">Add Player</button>
+                </div>
+                <button type="submit" class="btn btn-primary">Start Session</button>
+            </form>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard" class="page">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-card">
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Leaderboard items will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Page -->
+        <div id="players" class="page">
+            <h2>Players</h2>
+            <div class="players-grid" id="players-grid">
+                <!-- Player cards will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- History Page -->
+        <div id="history" class="page">
+            <h2>Session History</h2>
+            <div class="history-list" id="history-list">
+                <!-- Session history will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Settings Modal -->
+    <div id="profile-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Profile Settings</h2>
+            <div class="profile-settings">
+                <div class="avatar-section">
+                    <img id="current-avatar" src="/static/default-avatar.png" alt="Current Avatar" class="profile-picture">
+                    <div class="avatar-upload">
+                        <label for="avatar-upload" class="btn btn-primary">Change Avatar</label>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Enter username">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="save-profile">Save Changes</button>
+                    <button class="btn" id="close-profile-modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
